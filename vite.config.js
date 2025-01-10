@@ -5,6 +5,7 @@ import path from 'path'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  base: "/tax-georgia/",
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
