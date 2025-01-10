@@ -3,14 +3,21 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - master # или master, в зависимости от названия вашей основной ветки
+      - master
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: write
+  pages: write
+  id-token: write
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    concurrency: ci-${{ github.ref }}
 
     steps:
-      - name: Checkout
+      - name: Checkout 🛎️
         uses: actions/checkout@v4
 
       - name: Setup Node.js
@@ -25,7 +32,7 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Deploy
+      - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: dist
