@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { Box, Button, Collapse, Typography } from "@mui/material";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
@@ -9,31 +9,29 @@ import { useAppDispatch, useAppSelector, useCreateRow } from "../box/hooks";
 import { setOpenTable, setYears } from "../store/tables-reducers";
 
 const Home = () => {
-	const dispatch = useAppDispatch()
-	const years = useAppSelector(state => state.tablesReducer.years)
-	const rows = useAppSelector(state => state.tablesReducer.rows)
+	const dispatch = useAppDispatch();
+	const rows = useAppSelector(state => state.tablesReducer.rows);
+	const years = useAppSelector(state => state.tablesReducer.years);
 	const handleCreateRow = useCreateRow();
 
+	// Только сортируем года из rows, без обращения к years
 	const sortYears = useCallback(() => {
 		const yearsFromRows = [
 			...new Set(rows.map(item => new Date(item.date).getFullYear()))
 		].sort((a, b) => b - a);
 
-		return yearsFromRows.map(year => {
-			const yearFromState = years.find(y => y.year === year);
-			return {
-				year,
-				open: yearFromState ? yearFromState.open : true
-			};
-		});
-	}, [rows, years]);
+		return yearsFromRows.map(year => ({
+			year,
+			open: true // по умолчанию
+		}));
+	}, [rows]);
 
+	// Устанавливаем года в стор на основе rows
 	useEffect(() => {
 		dispatch(setYears(sortYears()));
 	}, [dispatch, sortYears]);
 
-	const sortedYears = useMemo(() => sortYears(), [sortYears]);
-
+	// Показываем те года, что есть в сторе (уже с open)
 	return (
 		<>
 			<Typography variant="h1" fontSize={32} fontWeight={900}>Калькулятор налогов Грузии</Typography>
@@ -41,24 +39,23 @@ const Home = () => {
 				<Buttons />
 			</Box>
 
-			{sortedYears?.map(({ year, open }) => (
+			{years?.map(({ year, open }) => (
 				<Box key={year} component="section" sx={{ border: '1px dashed grey', mt: 3, borderRadius: 1 }}>
 					<Button
 						onClick={() => dispatch(setOpenTable(year))}
 						variant="text"
 						fullWidth
-						sx={{padding: 3, justifyContent: 'flex-start', fontSize: 24}}
+						sx={{ padding: 3, justifyContent: 'flex-start', fontSize: 24 }}
 					>
 						{`${year} год`}
-
 						{open ? (
-							<KeyboardArrowUpIcon fontSize={'large'} sx={{marginLeft: 'auto'}}/>
+							<KeyboardArrowUpIcon fontSize={'large'} sx={{ marginLeft: 'auto' }} />
 						) : (
-							<KeyboardArrowDownIcon fontSize={'large'} sx={{marginLeft: 'auto'}} />
+							<KeyboardArrowDownIcon fontSize={'large'} sx={{ marginLeft: 'auto' }} />
 						)}
 					</Button>
 					<Collapse in={open}>
-						<Box padding={2} sx={{borderTop: '1px dashed grey'}}>
+						<Box padding={2} sx={{ borderTop: '1px dashed grey' }}>
 							<Table year={year} />
 							<Button
 								variant={'contained'}
