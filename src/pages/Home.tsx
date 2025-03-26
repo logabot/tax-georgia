@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { Box, Button, Collapse, Typography } from "@mui/material";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
@@ -10,28 +10,37 @@ import { setOpenTable, setYears } from "../store/tables-reducers";
 
 const Home = () => {
 	const dispatch = useAppDispatch();
-	const rows = useAppSelector(state => state.tablesReducer.rows);
 	const years = useAppSelector(state => state.tablesReducer.years);
+	const rows = useAppSelector(state => state.tablesReducer.rows);
 	const handleCreateRow = useCreateRow();
 
-	// Только сортируем года из rows, без обращения к years
-	const sortYears = useCallback(() => {
+	// Сохраняем текущее состояние years, чтобы не зависеть от него в useCallback
+	const yearsRef = useRef(years);
+
+	useEffect(() => {
+		yearsRef.current = years;
+	}, [years]);
+
+	// Безопасно создаём список лет с сохранением open
+	const generateYears = useCallback(() => {
 		const yearsFromRows = [
 			...new Set(rows.map(item => new Date(item.date).getFullYear()))
 		].sort((a, b) => b - a);
 
-		return yearsFromRows.map(year => ({
-			year,
-			open: true // по умолчанию
-		}));
+		return yearsFromRows.map(year => {
+			const existing = yearsRef.current.find(y => y.year === year);
+			return {
+				year,
+				open: existing ? existing.open : true
+			};
+		});
 	}, [rows]);
 
-	// Устанавливаем года в стор на основе rows
+	// Обновляем список лет при изменении rows
 	useEffect(() => {
-		dispatch(setYears(sortYears()));
-	}, [dispatch, sortYears]);
+		dispatch(setYears(generateYears()));
+	}, [dispatch, generateYears]);
 
-	// Показываем те года, что есть в сторе (уже с open)
 	return (
 		<>
 			<Typography variant="h1" fontSize={32} fontWeight={900}>Калькулятор налогов Грузии</Typography>
@@ -39,7 +48,7 @@ const Home = () => {
 				<Buttons />
 			</Box>
 
-			{years?.map(({ year, open }) => (
+			{years.map(({ year, open }) => (
 				<Box key={year} component="section" sx={{ border: '1px dashed grey', mt: 3, borderRadius: 1 }}>
 					<Button
 						onClick={() => dispatch(setOpenTable(year))}
@@ -49,17 +58,17 @@ const Home = () => {
 					>
 						{`${year} год`}
 						{open ? (
-							<KeyboardArrowUpIcon fontSize={'large'} sx={{ marginLeft: 'auto' }} />
+							<KeyboardArrowUpIcon fontSize="large" sx={{ marginLeft: 'auto' }} />
 						) : (
-							<KeyboardArrowDownIcon fontSize={'large'} sx={{ marginLeft: 'auto' }} />
+							<KeyboardArrowDownIcon fontSize="large" sx={{ marginLeft: 'auto' }} />
 						)}
 					</Button>
 					<Collapse in={open}>
 						<Box padding={2} sx={{ borderTop: '1px dashed grey' }}>
 							<Table year={year} />
 							<Button
-								variant={'contained'}
-								color={'success'}
+								variant="contained"
+								color="success"
 								onClick={() => handleCreateRow(year)}
 							>
 								Создать запись
