@@ -1,0 +1,25 @@
+import React, { FC, useEffect } from 'react';
+import { IRow, maybeFetchExchangeRate } from "../../../store/tables-reducers";
+import { useAppDispatch } from "../../../box/hooks";
+
+interface ITaxRateProps {
+	row: IRow;
+}
+
+export const TaxRate: FC<ITaxRateProps> = ({ row }) => {
+	const dispatch = useAppDispatch();
+
+	useEffect(() => {
+		if (row.status === 'idle') {
+			dispatch(maybeFetchExchangeRate(row));
+		}
+	}, [dispatch, row]);
+
+	return (
+		<>
+			{row.status === "loading" && <span>...</span>}
+			{row.status === "error" && <span>Ошибка загрузки</span>}
+			{row.status === "loaded" && <span>{row.exchangeRate ?? "Курс не найден"}</span>}
+		</>
+	);
+};
