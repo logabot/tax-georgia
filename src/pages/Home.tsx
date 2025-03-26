@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { Box, Button, Collapse, Typography } from "@mui/material";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
@@ -14,7 +14,7 @@ const Home = () => {
 	const rows = useAppSelector(state => state.tablesReducer.rows)
 	const handleCreateRow = useCreateRow();
 
-	const sortYears = useMemo(() => {
+	const sortYears = useCallback(() => {
 		const yearsFromRows = [
 			...new Set(rows.map(item => new Date(item.date).getFullYear()))
 		].sort((a, b) => b - a);
@@ -29,8 +29,10 @@ const Home = () => {
 	}, [rows, years]);
 
 	useEffect(() => {
-		dispatch(setYears(sortYears))
-	}, [rows])
+		dispatch(setYears(sortYears()));
+	}, [dispatch, sortYears]);
+
+	const sortedYears = useMemo(() => sortYears(), [sortYears]);
 
 	return (
 		<>
@@ -39,7 +41,7 @@ const Home = () => {
 				<Buttons />
 			</Box>
 
-			{sortYears?.map(({ year, open }) => (
+			{sortedYears?.map(({ year, open }) => (
 				<Box key={year} component="section" sx={{ border: '1px dashed grey', mt: 3, borderRadius: 1 }}>
 					<Button
 						onClick={() => dispatch(setOpenTable(year))}
