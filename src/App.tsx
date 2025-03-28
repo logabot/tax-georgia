@@ -13,7 +13,7 @@ const App: React.FC = () => {
   return (
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <Router basename="/tax-georgia">
+        <Router basename="/tax-georgia/">
           <Routes>
             {routes.map((route) => (
               <Route
