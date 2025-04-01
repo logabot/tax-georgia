@@ -13,13 +13,13 @@ export const TaxRate: FC<ITaxRateProps> = ({ row }) => {
 		if (row.status === 'idle') {
 			dispatch(maybeFetchExchangeRate(row));
 		}
-	}, [dispatch, row]);
+	}, [dispatch, row.status, row.id, row.currency, row.date]);
 
 	return (
 		<>
-			{row.status === "loading" && <span>...</span>}
-			{row.status === "error" && <span>Ошибка загрузки</span>}
-			{row.status === "loaded" && <span>{row.exchangeRate ?? "Курс не найден"}</span>}
+			{row?.status === "loading" && <span>...</span>}
+			{row?.status === "error" && <span>Ошибка загрузки</span>}
+			{row?.status === "loaded" && <span>{!row?.exchangeRate ? "Курс не найден" : row?.exchangeRate}</span>}
 		</>
 	);
 };

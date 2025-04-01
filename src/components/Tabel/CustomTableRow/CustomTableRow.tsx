@@ -68,11 +68,10 @@ export const CustomTableRow: FC<ITableRow> = ({ row, year }) => {
 			dispatch(setUpdateChangedDate(row.id));
 		}
 
-		// 🆕 Если меняется дата или валюта — проверяем курс
 		if (["currency", "date"].includes(name)) {
 			dispatch(maybeFetchExchangeRate(updatedRow));
 		}
-	}, [dispatch, row]);
+	}, [dispatch, row.id]);
 
 	useEffect(() => {
 		let timeoutId: NodeJS.Timeout;

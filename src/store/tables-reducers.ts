@@ -39,7 +39,6 @@ export const fetchExchangeRate = createAsyncThunk(
 	"tables/fetchExchangeRate",
 	async ({ id, currency, date }: { id: string; currency: Currency; date: string }) => {
 		const formattedDate = date.split('T')[0];
-		console.log("📦 Fetching rate for:", currency, formattedDate);
 
 		const response = await fetch(`${API_TAX_RATE_URL}?currencies=${currency}&date=${formattedDate}`);
 
@@ -48,8 +47,9 @@ export const fetchExchangeRate = createAsyncThunk(
 		}
 
 		const data = await response.json();
+		const exchangeRate = data[0]?.currencies[0]?.rate || 0; // Защита от отсутствия данных
 
-		return { id, exchangeRate: data[0]?.currencies[0]?.rate };
+		return { id, exchangeRate };
 	}
 );
 
@@ -62,7 +62,7 @@ export const maybeFetchExchangeRate = (row: IRow): AppThunk => (dispatch, getSta
 			exchangeRate: 1,
 			amountConverted: row.amount,
 			taxConverted: row.amount * (row.taxRate / 100),
-			status: 'loaded',
+			status: 'loaded', // Устанавливаем статус `loaded` сразу
 		}));
 		return;
 	}
@@ -77,7 +77,7 @@ export const maybeFetchExchangeRate = (row: IRow): AppThunk => (dispatch, getSta
 			taxConverted: (row.amount * cachedRate) * (row.taxRate / 100),
 			status: 'loaded',
 		}));
-	} else {
+	} else if (row.status !== 'loading') {
 		dispatch(fetchExchangeRate({ id: row.id, currency: row.currency, date: row.date }));
 	}
 };
