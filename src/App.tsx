@@ -5,15 +5,18 @@ import { useAppSelector } from "./box/hooks";
 import { darkTheme, lightTheme } from "./theme";
 import Layout from "./components/Layout/Layout";
 import { routes } from "./box/routes";
+import YandexMetrica from "./components/YandexMetrica/YandexMetrica";
 
 const App: React.FC = () => {
   const isDarkMode = useAppSelector(state => state.rootReducer.isDarkMode)
   const theme = isDarkMode ? darkTheme : lightTheme
+  const basename = process.env.NODE_ENV === 'production' ? '/tax-georgia' : '/'
 
   return (
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <Router basename="/tax-georgia/">
+        <Router basename={basename}>
+          <YandexMetrica />
           <Routes>
             {routes.map((route) => (
               <Route

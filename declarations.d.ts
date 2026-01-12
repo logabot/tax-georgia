@@ -28,3 +28,9 @@ declare module '*.gif' {
     const value: string;
     export default value;
 }
+
+declare module 'react-yandex-metrika';
+
+interface Window {
+  ym?: (counterId: number | string, action: string, ...params: any[]) => void;
+}
