@@ -13,6 +13,7 @@ export const TaxRate: FC<ITaxRateProps> = ({ row }) => {
 		if (row.status === 'idle') {
 			dispatch(maybeFetchExchangeRate(row));
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [dispatch, row.status, row.id, row.currency, row.date]);
 
 	return (
