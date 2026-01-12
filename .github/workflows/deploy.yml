@@ -13,6 +13,8 @@ permissions:
 
 jobs:
   build-and-deploy:
+    env:
+      NODE_ENV: production
     runs-on: ubuntu-latest
     concurrency: ci-${{ github.ref }}
 
