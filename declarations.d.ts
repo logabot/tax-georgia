@@ -1,3 +1,5 @@
+declare module 'react-dom/client';
+
 declare module '*.scss' {
     const content: { [className: string]: string };
     export = content;
