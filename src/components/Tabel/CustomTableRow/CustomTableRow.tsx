@@ -71,8 +71,7 @@ export const CustomTableRow: FC<ITableRow> = ({ row, year }) => {
 		if (["currency", "date"].includes(name)) {
 			dispatch(maybeFetchExchangeRate(updatedRow));
 		}
-	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [dispatch, row.id]);
+	}, [dispatch, row]);
 
 	useEffect(() => {
 		let timeoutId: NodeJS.Timeout;
